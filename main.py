@@ -8,6 +8,7 @@ import argparse
 COORDINATE_LATITUDE = 43.528484
 COORDINATE_LONGITUDE = -116.147614
 RADIUS = 2.03  # in miles
+YEAR = 2020
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1))
@@ -111,13 +112,14 @@ def get_unique_blocks_within_radius(center_lat, center_lon, radius):
     return list(block_fips_set)
 
 
-def get_population_for_block_fips(block_fips, api_key=None):
+def get_population_for_block_fips(block_fips, year, api_key=None):
     state_fips = block_fips[:2]
     county_fips = block_fips[2:5]
     tract_code = block_fips[5:11]
     block_code = block_fips[11:]
+    endpoint = f'https://api.census.gov/data/{year}/dec/pl'
     population_response = call_us_census_api(
-        'https://api.census.gov/data/2020/dec/pl',
+        endpoint,
         {
             'get': 'P1_001N',
             'for': f'block:{block_code}',
@@ -135,11 +137,13 @@ def run():
     parser.add_argument('--lat', type=float, help='Latitude of center point')
     parser.add_argument('--lon', type=float, help='Longitude of center point')
     parser.add_argument('--radius', type=float, help='Radius in miles')
+    parser.add_argument('--year', type=int, help='Census year (default: 2020)')
     args = parser.parse_args()
 
     latitude = args.lat if args.lat is not None else COORDINATE_LATITUDE
     longitude = args.lon if args.lon is not None else COORDINATE_LONGITUDE
     radius = args.radius if args.radius is not None else RADIUS
+    year = args.year if args.year is not None else YEAR
 
     api_key = os.getenv('CENSUS_API_KEY')
 
@@ -155,10 +159,11 @@ def run():
     # Get and sum population for each block
     total_population = 0
     for block_fips in block_fips_list:
-        pop = get_population_for_block_fips(block_fips, api_key)
+        pop = get_population_for_block_fips(block_fips, year, api_key)
         total_population += pop
 
-    print(f'Total population within {radius} miles: {total_population}')
+    print(f'Total population within {radius} miles (year {year}):')
+    print(total_population)
 
 
 if __name__ == "__main__":
