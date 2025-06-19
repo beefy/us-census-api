@@ -1,12 +1,15 @@
 import requests
 import os
 import math
+from tenacity import retry, stop_after_attempt, wait_exponential
+
 
 COORDINATE_LATITUDE = 43.528484
 COORDINATE_LONGITUDE = -116.147614
 RADIUS = 2.03  # in miles
 
 
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1))
 def call_us_census_api(endpoint: str, params: dict, api_key: str = None):
     """
     Calls the US Census API with the given endpoint and parameters.
@@ -30,6 +33,7 @@ def call_us_census_api(endpoint: str, params: dict, api_key: str = None):
     return response.json()
 
 
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1))
 def get_census_block_fips(lat: float, lon: float):
     """
     Get the census block FIPS code for the given latitude and longitude.

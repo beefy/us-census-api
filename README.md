@@ -26,6 +26,8 @@ export CENSUS_API_KEY=your_api_key_here
 
 ## Run the script
 
+Update constants at the top of main.py as needed.
+
 ```
 python3.11 main.py
 ```
