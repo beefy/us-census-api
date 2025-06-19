@@ -2,6 +2,7 @@ import requests
 import os
 import math
 from tenacity import retry, stop_after_attempt, wait_exponential
+import argparse
 
 
 COORDINATE_LATITUDE = 43.528484
@@ -65,7 +66,7 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     phi2 = math.radians(lat2)
     dphi = math.radians(lat2 - lat1)
     dlambda = math.radians(lon2 - lon1)
-    a = (math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) *
+    a = (math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) +
          math.sin(dlambda / 2) ** 2)
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return R * c
@@ -129,16 +130,27 @@ def get_population_for_block_fips(block_fips, api_key=None):
 
 
 def run():
+    parser = argparse.ArgumentParser(
+        description='US Census API Population Query')
+    parser.add_argument('--lat', type=float, help='Latitude of center point')
+    parser.add_argument('--lon', type=float, help='Longitude of center point')
+    parser.add_argument('--radius', type=float, help='Radius in miles')
+    args = parser.parse_args()
+
+    latitude = args.lat if args.lat is not None else COORDINATE_LATITUDE
+    longitude = args.lon if args.lon is not None else COORDINATE_LONGITUDE
+    radius = args.radius if args.radius is not None else RADIUS
+
     api_key = os.getenv('CENSUS_API_KEY')
 
     # Get all unique census blocks within the radius
     block_fips_list = get_unique_blocks_within_radius(
-        COORDINATE_LATITUDE,
-        COORDINATE_LONGITUDE,
-        RADIUS
+        latitude,
+        longitude,
+        radius
     )
 
-    print(f'Found {len(block_fips_list)} unique blocks within {RADIUS} miles')
+    print(f'Found {len(block_fips_list)} unique blocks within {radius} miles')
 
     # Get and sum population for each block
     total_population = 0
@@ -146,7 +158,7 @@ def run():
         pop = get_population_for_block_fips(block_fips, api_key)
         total_population += pop
 
-    print(f'Total population within {RADIUS} miles: {total_population}')
+    print(f'Total population within {radius} miles: {total_population}')
 
 
 if __name__ == "__main__":

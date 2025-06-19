@@ -31,3 +31,9 @@ Update constants at the top of main.py as needed.
 ```
 python3.11 main.py
 ```
+
+Or pass constants in as command line arguments
+
+```
+python3.11 main.py --lat 40.0 --lon -120.0 --radius 5
+```
