@@ -35,7 +35,7 @@ python3.11 main.py
 Or pass constants in as command line arguments
 
 ```
-python3.11 main.py --lat 43.528484 --lon -116.147614 --radius 2.03 --year 2010
+python3.11 main.py --lat 43.528484 --lon -116.147614 --radius 2.03 --year 2020
 ```
 
 Note: census is done every 10 years
