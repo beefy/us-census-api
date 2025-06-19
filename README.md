@@ -39,3 +39,12 @@ python3.11 main.py --lat 43.528484 --lon -116.147614 --radius 2.03 --year 2020
 ```
 
 Note: census is done every 10 years
+
+## Example output
+
+```
+python3.11 main.py --lat 43.528484 --lon -116.147614 --radius 2.03 --year 2020
+Found 17 unique blocks within 2.03 miles
+Total population within 2.03 miles (year 2020):
+1014
+```
