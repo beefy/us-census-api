@@ -23,3 +23,9 @@ Store the api key as an environment variable
 ```
 export CENSUS_API_KEY=your_api_key_here
 ```
+
+## Run the script
+
+```
+python3.11 main.py
+```
